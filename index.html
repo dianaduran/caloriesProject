@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Autocomplete</title>
+
+    <!--Libreries-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!--Fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
+
+    <!--Scripts-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <!--graphyc Chart-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js">
+    </script>
+
+    <script>
+        $(document).ready(function() {
+
+            var ndb;
+            var nameInput;
+            var showModal = true;
+
+            //graph element
+            var myChart;
+            Chart.defaults.global.animationSteps = 50;
+            Chart.defaults.global.tooltipYPadding = 16;
+            Chart.defaults.global.tooltipCornerRadius = 0;
+            Chart.defaults.global.tooltipTitleFontStyle = "normal";
+            Chart.defaults.global.tooltipFillColor = "rgba(0,160,0,0.8)";
+            Chart.defaults.global.animationEasing = "easeOutBounce";
+            Chart.defaults.global.responsive = true;
+            Chart.defaults.global.scaleLineColor = "black";
+            Chart.defaults.global.scaleFontSize = 16;
+
+            //function input search food
+            $('#search').keyup(function() {
+                $('#result').html('');
+
+                var searchField = $('#search').val();
+
+                if (searchField.length > 3) {
+                    $.getJSON('https://api.nal.usda.gov/ndb/search/?format=json&q=' + searchField + '&sort=n&max=25&offset=0&api_key=wifP7t9q1wqkljOO3Lm0GGu6OkI2mgA3qLNqIGir', function(data) {
+
+                        var response = data.list;
+                        if (response != undefined) {
+                            $.each(response.item, function(key, value) {
+
+                                var str = value.name;
+                                var rest = str.substr(0, str.search(", UPC")); //get the string without UPC number
+
+                                $('#result').append('<option class="opt" data-ndbno="' + value.ndbno + '" value="' + rest + '" ">');
+
+                            });
+                        }
+                        if (searchField != "") {
+                            $(".nameFood").html(searchField);
+                            $('#search').on('input', function() {
+                                var value = $(this).val();
+                                ndb = $('#result [value="' + value + '"]').data('ndbno');
+                                nameInput = value;
+
+                                console.log(nameInput);
+                            });
+
+                        }
+
+                    })
+                }
+            });
+
+            //click in the search button 
+            $("#btn-search").on('click', function(event) {
+                event.preventDefault();
+                if (ndb != undefined) {
+                    var queryURL = "https://api.nal.usda.gov/ndb/nutrients/?format=json&api_key=wifP7t9q1wqkljOO3Lm0GGu6OkI2mgA3qLNqIGir&nutrients=203&nutrients=204&nutrients=208&nutrients=291&nutrients=269&nutrients=205&ndbno=" + ndb;
+                    $.ajax({
+                        url: queryURL,
+                        method: "GET"
+                    }).then(function(response) {
+                        console.log(response);
+                        var resp = response.report.foods["0"].nutrients;
+
+                        for (var i = 0; i < resp.length; i++) {
+                            var idNutrientes = resp[i].nutrient_id;
+                            var valNutrients = resp[i].value;
+                            var unid = resp[i].unit;
+
+                            if (idNutrientes == "208") {
+                                $("#calories").html(isNumero(valNutrients));
+                                $("#calories").append(unid);
+                            }
+                            if (idNutrientes == "204") {
+                                $("#total-fat").html(isNumero(valNutrients));
+                                $("#total-fat").append(unid);
+                                myChart.data.datasets[0].data[0] = isNumero(valNutrients);
+                            }
+                            if (idNutrientes == "205") {
+                                $("#total-carb").html(isNumero(valNutrients));
+                                $("#total-carb").append(unid);
+                                myChart.data.datasets[0].data[1] = isNumero(valNutrients);
+                            }
+                            if (idNutrientes == "269") {
+                                $("#sugar").html(isNumero(valNutrients));
+                                $("#sugar").append(unid);
+                                myChart.data.datasets[0].data[2] = isNumero(valNutrients);
+                            }
+                            if (idNutrientes == "291") {
+                                $("#fiber").html(isNumero(valNutrients));
+                                $("#fiber").append(unid);
+                                myChart.data.datasets[0].data[3] = isNumero(valNutrients);
+                            }
+                            if (idNutrientes == "203") {
+                                $("#protein").html(isNumero(valNutrients));
+                                $("#protein").append(unid);
+                                myChart.data.datasets[0].data[4] = isNumero(valNutrients);
+                            }
+                        }
+                        myChart.update();
+                        getGiphy(nameInput);
+                        console.log(resp);
+                    });
+
+                }
+            });
+
+
+            function isNumero(val) {
+                var aux;
+                if (isNaN(val)) {
+                    aux = 0;
+                } else aux = val;
+                return aux;
+            }
+
+
+            //Add the graph element to the canvas
+            var ctx = document.getElementById("myChart");
+            myChart = new Chart(ctx, {
+                type: 'pie',
+
+                data: {
+                    labels: ["Fat", "Carbohydrates", "Sugar", "Fiber", "Protein"],
+                    datasets: [{
+                        data: [1, 1, 1, 1, 1],
+                        backgroundColor: [
+                            'rgba(255, 64, 0,0.4)',
+                            'rgba(64, 100, 229,0.4)',
+                            'rgba(255, 206, 86,0.4)',
+                            'rgba(75, 192, 192,0.4)',
+                            'rgba(153, 102, 255,0.4)',
+
+                        ],
+                        borderColor: [
+                            'rgba(255,99,132,2)',
+                            'rgba(54, 162, 235, 2)',
+                            'rgba(255, 206, 86, 2)',
+                            'rgba(75, 192, 192, 2)',
+                            'rgba(153, 102, 255, 2)',
+
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+
+                }
+            });
+
+            // After gettting the data from Ajax
+            // myChart.data.datasets[0].data.push(array_chart);
+
+
+            // myChart.data.datasets[0].data[0] = 10;
+            // myChart.data.datasets[0].data[1] = 10;
+            // myChart.data.datasets[0].data[2] = 10;
+            //myChart.data.datasets[0].data[3] = 20;
+            //myChart.data.datasets[0].data[4] = 50;
+
+
+            //myChart.update();
+
+            //function giphy
+            function getGiphy(nameInput) {
+                // buttonVal = $(e).val();
+                encVal = encodeURIComponent(nameInput);
+                xhr = $.get("https://api.giphy.com/v1/gifs/random?api_key=jEqdCGWOY7yfKVXlHz4wmLGW4OdlMl6C&rating=g&tag=" + encVal);
+                xhr.done(function(data) {
+
+                    $('#modalThing').prepend("<img class='img-thumbnail img-responsive img-rounded' src='" + data.data.images.fixed_height_still.url + "' />");
+
+                    console.log(data.data.images.fixed_height_still.url);
+
+
+                    //'If no Giphy query found: Show an Alert, Remove Button'
+                    if (data.data.length == 0) {
+                        showModal = false;
+                        $('#modalThing').prepend("Opps, We don't have a ghiphy for you!!! ");
+                    }
+                    //'handles the play/stop gif on all images prepended.'
+                    enable = $('img').click(function() {
+                        src = $(this).attr("src");
+
+                        if (src.indexOf("200_s.gif") > 1) {
+                            $(this).attr("src", src.replace(/200_s.gif/i, "200.gif"));
+                            console.log($(this).attr("src"));
+                        } else {
+                            $(this).attr("src", src.replace(/200.gif/i, "200_s.gif"));
+                            console.log($(this).attr("src"));
+                        }
+                    });
+                    if (showModal) {
+                        setTimeout(function() {
+                            $('.modal').modal({
+                                backdrop: 'static',
+                                keyboard: false
+                            });
+                        }, 9000);
+                    }
+
+                });
+            }
+
+            $(".empty").click(function() {
+                $("#modalThing").empty();
+                $("#search").val("");
+            });
+
+
+
+
+
+
+        });
+    </script>
+    <style>
+        /* styles search*/
+        
+        input[type="text"] {
+            width: 50% !important;
+        }
+        
+        .div-btn-input {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+        
+        .glyphicon-search {
+            font-size: 20px;
+        }
+        
+        .btn-default {
+            background: gray;
+            width: auto;
+            padding: 12.5px;
+        }
+        
+        .btn-default:hover {
+            background: gray;
+            color: white
+        }
+        
+        .form-control {
+            padding: 25px;
+            font-size: 20px;
+        }
+        
+        form {
+            margin-bottom: 20px;
+        }
+        /* style title*/
+        
+        h1 {
+            background: gray;
+            font-size: 70px;
+            padding: 10px;
+            color: white;
+            margin-bottom: 25px;
+        }
+        
+        .container-ntr-graph {
+            margin: 25px auto;
+        }
+        /* Nutrient table*/
+        
+        .table-container {
+            border: black 1px solid;
+            padding: 5px;
+        }
+        
+        .hr-ntrFacts {
+            border: black 4.5px solid
+        }
+        
+        .hr-cal {
+            border: black 3px solid;
+            margin: 1px;
+        }
+        
+        .hr-space {
+            border: black 1px solid;
+            margin-bottom: 1px;
+            margin-top: 1px;
+        }
+        
+        .nutrients {
+            margin: 1px 1px;
+        }
+        
+        .sugar-class {
+            font-weight: 100;
+            margin-left: 15px;
+            font-style: italic;
+        }
+        
+        span {
+            font-weight: 100;
+            font-style: italic;
+        }
+        
+        .nameFood.title {
+            line-height: .83em;
+            font-size: 2.7em;
+            padding-bottom: 4px;
+            font-family: 'Archivo Black';
+            white-space: nowrap;
+            letter-spacing: -2px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 2px 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <!--Modal-->
+    <div class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Is that healthy?</h5>
+                    <button type="button" class="close empty" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                </div>
+                <div class="modal-body" id="modalThing">
+
+                </div>
+                <div class="modal-footer">
+                    <p class="modal-title">Enjoy!</p>
+                    <button type="button" class="btn btn-secondary empty" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <h1 class="text-center">Title</h1>
+    </div>
+    <div class="container">
+
+        <div class="jumbotron" style="position: relative; height:auto;">
+            <form>
+                <div class="input-group">
+                    <input type="text" name="search" id="search" class="form-control" list="result" placeholder="Search">
+                    <div class="div-btn-input">
+                        <button class="btn btn-default" type="submit" id="btn-search">
+                          <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                    </div>
+                    <datalist id="result"></datalist>
+                </div>
+            </form>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="nameFood text-center"> </h2>
+                </div>
+            </div>
+
+            <div class="container-ntr-graph">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="table-container">
+                            <h3 class="title">Nutrition Facts</h3>
+                            <hr class="hr-ntrFacts"></hr>
+                            <h4 class="nutrients">Calories <span id="calories"></span></h4>
+                            <hr class="hr-cal"></hr>
+                            <h4 class="nutrients text-right">% Daily Value*</h4>
+                            <hr class="hr-space"></hr>
+                            <h4 class="nutrients"></h4>
+                            <h4 class="nutrients">Total Fat <span id="total-fat"></span></h4>
+                            <hr class="hr-space"></hr>
+                            <h4 class="nutrients">Total Carbohydrates <span id="total-carb"></span></h4>
+                            <hr class="hr-space" style="margin-left: 15px;"></hr>
+                            <h4 class="nutrients sugar-class">Sugars <span id="sugar"></span></h4>
+                            <hr class="hr-space" style="margin-left: 15px;"></hr>
+                            <h4 class="nutrients sugar-class">Dietary Fiber <span id="fiber"></span></h4>
+                            <hr class="hr-space"></hr>
+                            <h4 class="nutrients">Protein <span id="protein"></span></h4>
+                            <hr class="hr-ntrFacts" style="margin-top: 2px;"></hr>
+                            <h6 style="opacity: 0.5;">* Percent Daily Values are based on a 2000 calorie diet.</h6>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <div class="chart-container" style="position: relative; height:40vh; width:40vw">
+                            <canvas id="myChart" style="outline: black 2px solid;
+                            display: block;
+                            height: 184px;
+                            width: 281px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
