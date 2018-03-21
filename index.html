@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Autocomplete</title>
+    <link rel="icon" href="assets/imagen/foodRed.png" type="image/ico">
 
     <!--Libreries-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -49,14 +50,16 @@
     </div>
 
     <div class="container-fluid">
-        <h1 class="text-center">Title</h1>
+        <div class="text-center m-4">
+            <img src="assets/imagen/NutriSearch_logo.png" alt="NutriSearch logo">
+        </div>
     </div>
     <div class="container">
 
         <div class="jumbotron" style="position: relative; height:auto;">
             <form>
                 <div class="input-group">
-                    <input type="text" name="search" id="search" class="form-control" list="result" placeholder="Search">
+                    <input type="text" name="search" id="search" class="form-control" list="result" placeholder="Search Food">
                     <div class="div-btn-input">
                         <button class="btn btn-default" type="submit" id="btn-search">
                           <i class="glyphicon glyphicon-search"></i>
@@ -74,9 +77,9 @@
 
             <div class="container-ntr-graph">
                 <div class="row">
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <div class="table-container">
-                            <h3 class="title">Nutrition Facts</h3>
+                            <h3 class="title text-center">Nutrition Facts</h3>
                             <hr class="hr-ntrFacts"></hr>
                             <h4 class="nutrients">Calories <span id="calories"></span></h4>
                             <hr class="hr-cal"></hr>
@@ -96,13 +99,13 @@
                             <h6 style="opacity: 0.5;">* Percent Daily Values are based on a 2000 calorie diet.</h6>
                         </div>
                     </div>
+                    <div class="col-md-1"></div>
 
                     <div class="col-md-7">
-                        <div class="chart-container" style="position: relative; height:40vh; width:40vw">
-                            <canvas id="myChart" style="outline: black 2px solid;
+                        <div class="chart-container" style="height:25vh; width:37.5vw">
+                            <canvas id="myChart" style="
                             display: block;
-                            height: 184px;
-                            width: 281px;"></canvas>
+                            height:38vh; width:35vw;"></canvas>
                         </div>
                     </div>
                 </div>

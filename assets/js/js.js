@@ -32,7 +32,7 @@ $(document).ready(function() {
                         var str = value.name;
                         var rest = str.substr(0, str.search(", UPC")); //get the string without UPC number
 
-                        $('#result').append('<option class="opt" data-ndbno="' + value.ndbno + '" value="' + rest + '" ">');
+                        $('#result').append('<option data-ndbno="' + value.ndbno + '" value="' + rest + '" ">');
 
                     });
                 }
@@ -60,7 +60,7 @@ $(document).ready(function() {
                 url: queryURL,
                 method: "GET"
             }).then(function(response) {
-                // console.log(response);
+                console.log(response);
                 var resp = response.report.foods["0"].nutrients;
 
                 for (var i = 0; i < resp.length; i++) {
