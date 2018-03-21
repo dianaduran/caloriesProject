@@ -22,8 +22,8 @@ $(document).ready(function() {
 
         var searchField = $('#search').val();
 
-        //    if (searchField.length > 3) {
-        $.getJSON('https://api.nal.usda.gov/ndb/search/?format=json&q=' + searchField + '&sort=n&max=25&offset=0&api_key=wifP7t9q1wqkljOO3Lm0GGu6OkI2mgA3qLNqIGir', function(data) {
+        if (searchField.length > 3) {
+            $.getJSON('https://api.nal.usda.gov/ndb/search/?format=json&q=' + searchField + '&sort=n&max=25&offset=0&api_key=wifP7t9q1wqkljOO3Lm0GGu6OkI2mgA3qLNqIGir', function(data) {
 
                 var response = data.list;
                 if (response != undefined) {
@@ -48,7 +48,7 @@ $(document).ready(function() {
                 }
 
             })
-            //   }
+        }
     });
 
     //click in the search button 
