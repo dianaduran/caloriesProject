@@ -146,8 +146,21 @@ $(document).ready(function() {
         },
 
         options: {
-            responsive: true,
-            maintainAspectRatio: true,
+            title: {
+                display: true,
+                text: 'Nutrient Concentration',
+                textAlign: 'left',
+                position: 'top'
+            },
+            legend: {
+                display: true,
+                position: 'right',
+            },
+            animation: {
+                animateScale: true
+            },
+            // responsive: true,
+            // maintainAspectRatio: true
 
         }
     });
