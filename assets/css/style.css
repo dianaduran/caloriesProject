@@ -136,4 +136,27 @@ h3 {
 }
 
 
-/*outline: black 1px solid;*/
+/* .header-img {
+    background-image: url("../imagen/NutriSearch_logo.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    height: 100%;
+} */
+
+@media screen and (max-width: 768px) {
+    #header-img {
+        src: url("../imagen/NutriSearch_logo_SM.png");
+        width: 50%;
+        height: 10%;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    #header-img {
+        src: url("../imagen/NutriSearch_logo_SM.png");
+        width: 50%;
+        height: 10%;
+    }
+}
