@@ -105,15 +105,6 @@ h3 {
 }
 
 .nameFood.title {
-    /* line-height: .83em;
-    font-size: 2.7em;
-    padding-bottom: 4px;
-    font-family: 'Archivo Black';
-    white-space: nowrap;
-    letter-spacing: -2px;
-    font-weight: bold;
-    text-align: center;
-    margin: 10px 2px 0px; */
     line-height: 50px;
     font-size: 24pt;
     padding-bottom: 2px;
@@ -122,6 +113,10 @@ h3 {
     font-weight: bold;
     text-align: center;
     margin: 5px 5px 5px;
+}
+
+.nameFood {
+    font-family: fantasy;
 }
 
 
@@ -134,16 +129,6 @@ h3 {
     top: 0px;
     bottom: 0px;
 }
-
-
-/* .header-img {
-    background-image: url("../imagen/NutriSearch_logo.png");
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: cover;
-    height: 100%;
-} */
 
 @media screen and (max-width: 768px) {
     #header-img {
