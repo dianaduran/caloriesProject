@@ -65,6 +65,7 @@ h1 {
 .table-container {
     border: black 1px solid;
     padding: 5px;
+    margin: 25px;
 }
 
 .hr-ntrFacts {
@@ -84,6 +85,7 @@ h1 {
 
 .nutrients {
     margin: 1px 1px;
+    font-weight: bold;
 }
 
 .sugar-class {
